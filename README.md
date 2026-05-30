@@ -71,6 +71,8 @@ conda activate artist
 pip install -r requirements.txt
 ```
 
+`requirements.lock.txt` contains the exact frozen environment used in our experiments (for reproducibility).
+
 Training and inference were run on **NVIDIA H100** GPUs (SFT on 1×H100, RL on 4×H100).
 
 ## Usage
