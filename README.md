@@ -40,7 +40,7 @@ Rather than relying on a static summary of the full sequence, ARTIST **actively 
   <img src="assets/artist_method.png" alt="ARTIST controller-reasoner architecture and hierarchical policy optimization" width="850">
 </p>
 
-ARTIST equips a single policy `π_θ` (Qwen3-4B backbone + a lightweight MLP patch encoder) with two role-specific prompts:
+ARTIST is a single policy `π_θ` (Qwen3-4B backbone + a lightweight MLP patch encoder) that operates in two roles: a **controller** that selects the next segment and decides when to stop, and a **reasoner** that produces segment-conditioned reasoning and the final answer. Inference unfolds as an interleaved trace that alternates natural-language reasoning with segment-selection tool calls:
 
 ```
 <think> reasoning ... </think>
