@@ -15,6 +15,11 @@ Usage:
 Make sure the training code directory is in your PYTHONPATH or run from the training code directory.
 """
 
+# --- make the `artist` library package importable via flat module names ---
+import os as _os, sys as _sys
+_sys.path.insert(0, _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), "artist"))
+# ---------------------------------------------------------------------------
+
 import os
 import sys
 import torch

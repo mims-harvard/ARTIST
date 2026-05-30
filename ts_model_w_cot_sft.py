@@ -4,6 +4,11 @@ Adapted from qwen3_ts_model_w_cot.py for the new Qwen3TS architecture
 Uses <ts><ts/> placeholders with processor-based encoding
 """
 
+# --- make the `artist` library package importable via flat module names ---
+import os as _os, sys as _sys
+_sys.path.insert(0, _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), "artist"))
+# ---------------------------------------------------------------------------
+
 import os
 import torch
 import pytorch_lightning as pl

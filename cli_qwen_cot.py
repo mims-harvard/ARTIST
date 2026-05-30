@@ -1,3 +1,8 @@
+# --- make the `artist` library package importable via flat module names ---
+import os as _os, sys as _sys
+_sys.path.insert(0, _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), "artist"))
+# ---------------------------------------------------------------------------
+
 import logging
 import os
 import warnings

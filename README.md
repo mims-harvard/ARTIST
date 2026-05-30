@@ -17,10 +17,6 @@
   <img src="assets/artist_overview.png" alt="ARTIST overview" width="750">
 </p>
 
-<p align="center">
-  <i>(a) Time-series reasoning: answering a natural-language question given a time series. (b) ARTIST alternates between reasoning and adaptive segment selection, choosing the next segment based on the question and intermediate outputs, and stopping once it can produce the final answer.</i>
-</p>
-
 ---
 
 ## Overview
@@ -112,8 +108,6 @@ python inference_controller_reasoner_atk.py \
 
 ## Citation
 
-If you find ARTIST useful in your research, please cite:
-
 ```bibtex
 @inproceedings{messica2026artist,
   title     = {Adaptive Time Series Reasoning via Segment Selection},
@@ -128,4 +122,4 @@ If you find ARTIST useful in your research, please cite:
 
 ## Contact
 
-For questions, please open an issue or contact **Shvat Messica** (`shvat.messica@fas.harvard.edu`) and **Marinka Zitnik** (`marinka@hms.harvard.edu`).
+For questions, please open an issue or contact [Shvat Messica](mailto:shvat.messica@fas.harvard.edu) and [Marinka Zitnik](mailto:marinka@hms.harvard.edu).
