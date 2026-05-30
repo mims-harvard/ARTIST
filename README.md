@@ -14,8 +14,11 @@
 </p>
 
 <p align="center">
-  <!-- Add the ARTIST overview figure (Figure 1/2 from the paper) here -->
-  <img src="assets/artist_overview.png" alt="ARTIST overview" width="800">
+  <img src="assets/artist_overview.png" alt="ARTIST overview" width="750">
+</p>
+
+<p align="center">
+  <i>(a) Time-series reasoning: answering a natural-language question given a time series. (b) ARTIST alternates between reasoning and adaptive segment selection, choosing the next segment based on the question and intermediate outputs, and stopping once it can produce the final answer.</i>
 </p>
 
 ---
@@ -38,6 +41,10 @@ Rather than relying on a static summary of the full sequence, ARTIST **actively 
 3. **Strong empirical results.** On six benchmarks, ARTIST outperforms seven strong baselines (text LLMs, time-series encoder models, and vision-language models) while consuming a smaller fraction of the input series.
 
 ## Method
+
+<p align="center">
+  <img src="assets/artist_method.png" alt="ARTIST controller-reasoner architecture and hierarchical policy optimization" width="850">
+</p>
 
 ARTIST equips a single policy `π_θ` (Qwen3-4B backbone + a lightweight MLP patch encoder) with two role-specific prompts:
 

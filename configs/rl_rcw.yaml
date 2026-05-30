@@ -1,0 +1,61 @@
+# ARTIST RL (collaborative self-play) config — RCW (Right Whale Call, TimerBed)
+# Used by:  python train_controller_reasoner_opt.py -c configs/rl_rcw.yaml
+# and by:   python inference_controller_reasoner_atk.py --dataset_config configs/rl_rcw.yaml ...
+
+general:
+  model_path: /path/to/artist-sft-rcw
+  output_dir: ./outputs/artist_rl_rcw
+  training_stage: mcq
+  w_cot: true
+  use_lora: false
+  use_4bit: false
+  lora_r: 8
+  lora_alpha: 16
+  lora_dropout: 0.05
+
+model:
+  adapter_type: mlp
+
+dataset:
+  class_path: multimodal.TimerbedRCWTask
+  init_args:
+    cache_path: data/processed/rcw           # 4000-length acoustic series
+    batch_size: 1
+    num_classes: 2                           # binary choice
+    task_name: RCW
+    w_cot: true
+    scale_ts: true
+    encoder_name: totem
+
+controller_reasoner:
+  max_rounds: 5
+  num_rollouts: 6
+  first_seg_trials: 5
+  include_full_ts_initially: true
+  controller_temperature: 1.0
+  reasoner_temperature: 0.7
+  reasoner_max_new_tokens: 512
+  num_loops_per_generation: 1
+
+reward:
+  accuracy_weight: 3.0
+  consistency_weight: 3.0
+  format_weight: 1.0
+  lambda_penalty: 0.1
+  penalty_type: linear
+
+train:
+  num_train_epochs: 1
+  per_device_train_batch_size: 1
+  gradient_accumulation_steps: 16
+  learning_rate: 1.0e-6
+  lr_scheduler_type: linear
+  warmup_steps: 10
+  max_prompt_length: 2048
+  beta: 0.002
+  loss_type: bnpo
+  bf16: true
+  gradient_checkpointing: true
+  logging_steps: 5
+  save_steps: 50
+  use_balanced_sampling: false
