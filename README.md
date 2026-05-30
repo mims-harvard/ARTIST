@@ -1,4 +1,4 @@
-# ARTIST: Adaptive Reasoning for Time-Series via Temporal Selection
+<h1 align="center">ARTIST: Adaptive Reasoning for Time-Series via Temporal Selection</h1>
 
 <p align="center">
   <a href="https://arxiv.org/abs/2602.18645"><img src="https://img.shields.io/badge/arXiv-2602.18645-b31b1b.svg" alt="arXiv"></a>
@@ -17,9 +17,7 @@
   <img src="assets/artist_overview.png" alt="ARTIST overview" width="750">
 </p>
 
----
-
-## Overview
+## 🔍 Overview
 
 Time-series reasoning tasks start with a natural-language question and require **targeted** analysis of a time series. Evidence may span the full series or appear in only a few short intervals, so the model must decide *what to inspect*. Most existing approaches encode the **entire** time series into a fixed representation before inference, regardless of relevance.
 
@@ -30,13 +28,13 @@ Time-series reasoning tasks start with a natural-language question and require *
 
 Rather than relying on a static summary of the full sequence, ARTIST **actively acquires** task-relevant information at inference time. A novel **hierarchical, collaborative self-play** post-training method lets a single policy excel at both segment selection and question answering.
 
-## Key Contributions
+## ✨ Key Contributions
 
 1. **Adaptive segment selection for time-series reasoning.** The model iteratively chooses temporal segments to inspect and updates its reasoning based on retrieved segments, with no pre-defined segment labels.
 2. **Hierarchical, collaborative self-play RL.** A post-training method that separates segment selection from answer generation and trains each role with role-aligned learning signals — a *reliability* reward for the controller and a correctness/format reward for the reasoner.
 3. **Strong empirical results.** On six benchmarks, ARTIST outperforms seven strong baselines (text LLMs, time-series encoder models, and vision-language models) while consuming a smaller fraction of the input series.
 
-## Method
+## 🧠 Method
 
 <p align="center">
   <img src="assets/artist_method.png" alt="ARTIST controller-reasoner architecture and hierarchical policy optimization" width="850">
@@ -58,7 +56,7 @@ Training proceeds in two stages:
 1. **Supervised fine-tuning (SFT)** — LoRA-based fine-tuning on curated reasoning traces that interleave natural language with segment-selection tool calls.
 2. **Reinforcement learning (RL)** — full-parameter fine-tuning via collaborative self-play with **hierarchical policy optimization**: trajectory-level credit for the controller and final-round, segment-conditioned optimization for the reasoner, with **variance-guided sampling** of reasoner rollouts.
 
-## Installation
+## ⚙️ Installation
 
 ```bash
 git clone https://github.com/mims-harvard/ARTIST.git
@@ -75,7 +73,7 @@ pip install -r requirements.txt
 
 Training and inference were run on **NVIDIA H100** GPUs (SFT on 1×H100, RL on 4×H100).
 
-## Usage
+## 🚀 Usage
 
 ### 1. Supervised fine-tuning (SFT)
 
@@ -108,7 +106,7 @@ python inference_controller_reasoner_atk.py \
 
 > Default sampling temperatures: reasoner `0.7`, controller `1.0`. Accuracy and F1 are reported as averages over 8 independent runs per dataset.
 
-## Citation
+## 📑 Citation
 
 ```bibtex
 @inproceedings{messica2026artist,
@@ -122,6 +120,6 @@ python inference_controller_reasoner_atk.py \
 }
 ```
 
-## Contact
+## 📬 Contact
 
 For questions, please open an issue or contact [Shvat Messica](mailto:shvat.messica@fas.harvard.edu) and [Marinka Zitnik](mailto:marinka@hms.harvard.edu).
