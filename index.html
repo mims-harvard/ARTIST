@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ARTIST: Adaptive Time Series Reasoning via Segment Selection</title>
+<meta name="description" content="ARTIST: Adaptive Time Series Reasoning via Segment Selection. ICML 2026.">
+<meta property="og:title" content="ARTIST: Adaptive Time Series Reasoning via Segment Selection">
+<meta property="og:description" content="A controller–reasoner model that interleaves reasoning with adaptive temporal segment selection, trained with hierarchical collaborative self-play RL. ICML 2026.">
+<meta property="og:image" content="assets/artist_overview.png">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Source+Serif+4:opsz,wght@8..60,500;8..60,600;8..60,700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#15181d; --muted:#5b626c; --line:#e7e9ee; --bg:#ffffff; --soft:#f6f7f9;
+    --accent:#2f6f4f; --accent-soft:#e8f2ec; --max:880px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:"Inter",system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+    font-size:17px; line-height:1.65; -webkit-font-smoothing:antialiased;
+  }
+  a{color:var(--accent); text-decoration:none}
+  a:hover{text-decoration:underline}
+  .wrap{max-width:var(--max); margin:0 auto; padding:0 24px}
+
+  /* nav */
+  nav{position:sticky; top:0; z-index:20; background:rgba(255,255,255,.86);
+      backdrop-filter:saturate(180%) blur(10px); border-bottom:1px solid var(--line)}
+  nav .wrap{display:flex; align-items:center; justify-content:space-between; height:54px}
+  nav .brand{font-weight:800; letter-spacing:.02em}
+  nav .links a{color:var(--muted); font-size:14px; font-weight:600; margin-left:20px}
+  nav .links a:hover{color:var(--ink); text-decoration:none}
+  @media(max-width:640px){nav .links{display:none}}
+
+  /* hero */
+  header{padding:64px 0 28px; text-align:center; border-bottom:1px solid var(--line)}
+  .venue{display:inline-block; font-size:13px; font-weight:700; letter-spacing:.08em;
+         text-transform:uppercase; color:var(--accent); background:var(--accent-soft);
+         padding:5px 12px; border-radius:999px; margin-bottom:18px}
+  h1{font-family:"Source Serif 4",Georgia,serif; font-weight:600; font-size:40px;
+     line-height:1.18; margin:0 auto 6px; max-width:760px; letter-spacing:-.01em}
+  .subtitle{color:var(--muted); font-size:18px; margin:0 auto 26px; max-width:640px}
+  .authors{font-size:17px; margin:0 auto 6px; max-width:720px}
+  .authors a{color:var(--ink); font-weight:400}
+  .authors sup{color:var(--accent); font-weight:700}
+  .affil{color:var(--muted); font-size:14px; margin:8px auto 4px; max-width:720px}
+  .affil .eq{display:block; margin-top:4px; font-style:italic}
+
+  /* buttons */
+  .btns{display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin:26px 0 6px}
+  .btn{display:inline-flex; align-items:center; gap:8px; padding:9px 16px; border-radius:999px;
+       background:var(--ink); color:#fff; font-size:14.5px; font-weight:600; border:1px solid var(--ink)}
+  .btn:hover{text-decoration:none; opacity:.9}
+  .btn.alt{background:#fff; color:var(--ink)}
+  .btn svg{width:15px; height:15px; fill:currentColor}
+
+  /* sections */
+  section{padding:46px 0; border-bottom:1px solid var(--line)}
+  h2{font-family:"Source Serif 4",Georgia,serif; font-weight:600; font-size:27px; margin:0 0 18px}
+  p{margin:0 0 16px}
+  .lead{color:#2a2e35}
+  figure{margin:6px 0 8px}
+  figure img{width:100%; height:auto; display:block; border:none; border-radius:10px}
+  figcaption{color:var(--muted); font-size:14px; margin-top:10px; text-align:center}
+  ul.clean{padding-left:20px; margin:0 0 16px}
+  ul.clean li{margin:7px 0}
+
+  /* results table */
+  .tablewrap{overflow-x:auto; border:1px solid var(--line); border-radius:10px}
+  table{border-collapse:collapse; width:100%; font-size:11.5px; min-width:0}
+  th,td{padding:6px 6px; text-align:center; border-bottom:1px solid var(--line); white-space:nowrap}
+  thead tr:first-child th{border-bottom:1px solid var(--line)}
+  th:first-child,td:first-child{text-align:left}
+  thead th{background:var(--soft); font-weight:700; color:#2a2e35}
+  tbody tr:last-child td{border-bottom:none}
+  tr.grp td{background:#eef1f4; text-align:left; font-weight:700; font-size:10.5px;
+            letter-spacing:.05em; text-transform:uppercase; color:#41474f; padding:7px 8px}
+  td.fam{text-align:left; font-weight:700}
+  td.sub{text-align:left; padding-left:22px}
+  tr.best td{background:var(--accent-soft); font-weight:700}
+  tr.imp td{color:var(--accent); font-weight:600; border-top:2px solid var(--line)}
+  .note{color:var(--muted); font-size:13.5px; margin-top:10px}
+
+  /* bibtex */
+  pre{background:#0f1217; color:#e8ebf0; border-radius:10px; padding:18px 20px;
+      overflow-x:auto; font-size:13.5px; line-height:1.55; margin:0;
+      font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+  .copy{float:right; font-size:12px; font-weight:600; color:var(--muted); cursor:pointer;
+        border:1px solid var(--line); border-radius:6px; padding:3px 9px; background:#fff}
+  .copy:hover{color:var(--ink)}
+
+  footer{padding:34px 0 60px; text-align:center; color:var(--muted); font-size:13.5px}
+  footer p{margin:6px 0}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <span class="brand">ARTIST</span>
+    <span class="links">
+      <a href="#overview">Overview</a>
+      <a href="#method">Method</a>
+      <a href="#results">Results</a>
+      <a href="#citation">Citation</a>
+      <a href="https://github.com/mims-harvard/ARTIST">Code</a>
+    </span>
+  </div>
+</nav>
+
+<header>
+  <div class="wrap">
+    <span class="venue">ICML 2026</span>
+    <h1>Adaptive Time Series Reasoning via Segment Selection</h1>
+
+    <p class="authors">
+      <a href="mailto:shvat.messica@fas.harvard.edu">Shvat Messica</a><sup>1</sup>,
+      Jiawen Zhang<sup>2,*</sup>,
+      Kevin Li<sup>3,*</sup>,
+      Theodoros Tsiligkaridis<sup>4</sup>,
+      <a href="https://zitniklab.hms.harvard.edu/">Marinka Zitnik</a><sup>1</sup>
+    </p>
+    <p class="affil">
+      <sup>1</sup>Harvard Medical School &nbsp;·&nbsp;
+      <sup>2</sup>HKUST (Guangzhou) &nbsp;·&nbsp;
+      <sup>3</sup>MIT &nbsp;·&nbsp;
+      <sup>4</sup>MIT Lincoln Laboratory
+      <span class="eq">*Equal contribution</span>
+    </p>
+
+    <div class="btns">
+      <a class="btn" href="https://arxiv.org/abs/2602.18645">
+        <svg viewBox="0 0 384 512"><path d="M64 0C28.7 0 0 28.7 0 64V448c0 35.3 28.7 64 64 64H320c35.3 0 64-28.7 64-64V160H256c-17.7 0-32-14.3-32-32V0H64zM256 0V128H384L256 0z"/></svg>
+        Paper
+      </a>
+      <a class="btn alt" href="https://arxiv.org/abs/2602.18645">
+        <svg viewBox="0 0 448 512"><path d="M384 32H64C28.7 32 0 60.7 0 96V416c0 35.3 28.7 64 64 64H384c35.3 0 64-28.7 64-64V96c0-35.3-28.7-64-64-64z"/></svg>
+        arXiv
+      </a>
+      <a class="btn alt" href="https://github.com/mims-harvard/ARTIST">
+        <svg viewBox="0 0 496 512"><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8z"/></svg>
+        Code
+      </a>
+      <a class="btn alt" href="#citation">
+        <svg viewBox="0 0 384 512"><path d="M64 0C28.7 0 0 28.7 0 64V448c0 35.3 28.7 64 64 64H320c35.3 0 64-28.7 64-64V160H256c-17.7 0-32-14.3-32-32V0H64z"/></svg>
+        BibTeX
+      </a>
+    </div>
+  </div>
+</header>
+
+<section id="teaser" style="border-bottom:1px solid var(--line)">
+  <div class="wrap">
+    <figure>
+      <img src="assets/artist_overview.png" alt="ARTIST overview">
+      <figcaption>(a) Time-series reasoning: answering a natural-language question given a time series. (b) ARTIST alternates between reasoning and adaptive segment selection, choosing the next segment based on the question and intermediate outputs, and stopping once it can produce the final answer.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<section id="overview">
+  <div class="wrap">
+    <h2>Overview</h2>
+    <p class="lead">Time-series reasoning tasks start with a natural-language question and require <em>targeted</em> analysis of a time series. Evidence may span the full series or appear in only a few short intervals, so the model must decide what to inspect. Most existing approaches encode the <em>entire</em> series into a fixed representation before inference, regardless of relevance.</p>
+    <p><strong>ARTIST</strong> formulates time-series reasoning as a <strong>sequential decision problem</strong>. It interleaves reasoning with adaptive temporal segment selection using a <strong>controller–reasoner</strong> architecture and trains both roles with reinforcement learning:</p>
+    <ul class="clean">
+      <li>A high-level <strong>controller</strong> selects the next informative segment and decides when to stop, conditioned on the question and intermediate outputs.</li>
+      <li>A low-level <strong>reasoner</strong> produces segment-conditioned reasoning traces and the final answer.</li>
+    </ul>
+    <p>Rather than relying on a static summary of the full sequence, ARTIST <strong>actively acquires</strong> task-relevant information at inference time. A hierarchical, collaborative self-play post-training method lets a single policy excel at both segment selection and question answering — improving average accuracy by <strong>6.46</strong> points over the strongest baseline across six benchmarks while typically using only 30–70% of the input series per query.</p>
+  </div>
+</section>
+
+<section id="method">
+  <div class="wrap">
+    <h2>Method</h2>
+    <figure>
+      <img src="assets/artist_method.png" alt="ARTIST controller-reasoner architecture and hierarchical policy optimization">
+      <figcaption>ARTIST generates interaction trajectories by alternating a controller (segment selection) and a reasoner (segment-conditioned answers), then performs a joint hierarchical policy update.</figcaption>
+    </figure>
+    <p>ARTIST is a single policy LLM that operates in different roles for time series reasoning: a <strong>controller</strong> that selects the next segment and decides when to stop, and a <strong>reasoner</strong> that produces segment-conditioned reasoning and the final answer. Training proceeds in two stages:</p>
+    <ul class="clean">
+      <li><strong>Supervised fine-tuning (SFT).</strong> LoRA fine-tuning on curated reasoning traces that interleave natural language with segment-selection tool calls.</li>
+      <li><strong>Reinforcement learning (RL).</strong> Full-parameter fine-tuning via collaborative self-play with <strong>hierarchical policy optimization</strong> — trajectory-level credit for the controller and final-round, segment-conditioned optimization for the reasoner, with variance-guided sampling of reasoner rollouts.</li>
+    </ul>
+  </div>
+</section>
+
+<section id="results">
+  <div class="wrap" style="max-width:1040px">
+    <h2>Results</h2>
+    <p>Across six time-series reasoning benchmarks spanning clinical, financial, environmental, and general domains, ARTIST outperforms strong text LLMs, time-series reasoning models, and vision-language models. Accuracy and F1 (%) against general LLMs and time-series reasoning baselines:</p>
+    <div class="tablewrap">
+      <table>
+        <thead>
+          <tr>
+            <th rowspan="2">Model</th>
+            <th colspan="2">ETI</th><th colspan="2">RCW</th><th colspan="2">ECG-QA</th>
+            <th colspan="2">Sleep-QA</th><th colspan="2">TSQA</th><th colspan="2">TRQA</th>
+            <th colspan="2">Avg.</th>
+          </tr>
+          <tr>
+            <th>Acc</th><th>F1</th><th>Acc</th><th>F1</th><th>Acc</th><th>F1</th>
+            <th>Acc</th><th>F1</th><th>Acc</th><th>F1</th><th>Acc</th><th>F1</th><th>Acc</th><th>F1</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>Random Guess</td><td>25.00</td><td>25.00</td><td>50.00</td><td>50.00</td><td>50.00</td><td>50.00</td><td>16.67</td><td>16.67</td><td>29.67</td><td>29.67</td><td>37.13</td><td>37.13</td><td>34.74</td><td>34.74</td></tr>
+
+          <tr class="grp"><td colspan="15">General-purpose LLMs</td></tr>
+          <tr><td class="fam">GPT-5</td><td colspan="14"></td></tr>
+          <tr><td class="sub">w/o statistics</td><td>29.50</td><td>27.90</td><td>34.07</td><td>34.88</td><td>51.98</td><td>51.78</td><td>0.49</td><td>1.77</td><td>30.92</td><td>27.22</td><td>21.50</td><td>21.67</td><td>28.08</td><td>27.54</td></tr>
+          <tr><td class="sub">w/ statistics</td><td>63.54</td><td>63.72</td><td>32.74</td><td>31.08</td><td>53.96</td><td>49.62</td><td>0.49</td><td>1.49</td><td>35.75</td><td>32.24</td><td>25.00</td><td>28.70</td><td>35.25</td><td>34.48</td></tr>
+          <tr><td class="fam">Llama-3 8B</td><td colspan="14"></td></tr>
+          <tr><td class="sub">w/o statistics</td><td>25.50</td><td>25.96</td><td>43.97</td><td>40.41</td><td>50.00</td><td>48.45</td><td>31.99</td><td>14.09</td><td>48.97</td><td>46.75</td><td>57.69</td><td>53.88</td><td>43.02</td><td>38.26</td></tr>
+          <tr><td class="sub">w/ statistics</td><td>35.50</td><td>34.39</td><td>62.83</td><td>45.82</td><td>50.00</td><td>48.90</td><td>22.06</td><td>13.34</td><td>44.93</td><td>44.12</td><td>55.50</td><td>53.02</td><td>45.14</td><td>39.93</td></tr>
+          <tr><td class="fam">Qwen3-8B</td><td colspan="14"></td></tr>
+          <tr><td class="sub">w/o statistics</td><td>25.25</td><td>24.61</td><td>0.00</td><td>0.00</td><td>50.62</td><td>48.46</td><td>4.90</td><td>6.71</td><td>11.35</td><td>11.02</td><td>14.63</td><td>15.20</td><td>17.88</td><td>17.87</td></tr>
+          <tr><td class="sub">w/ statistics</td><td>45.00</td><td>40.88</td><td>0.00</td><td>0.00</td><td>51.86</td><td>49.06</td><td>1.96</td><td>3.87</td><td>13.53</td><td>12.78</td><td>15.25</td><td>14.02</td><td>21.35</td><td>20.31</td></tr>
+          <tr><td class="fam">Qwen3-14B</td><td colspan="14"></td></tr>
+          <tr><td class="sub">w/o statistics</td><td>32.00</td><td>30.66</td><td>33.19</td><td>27.40</td><td>50.99</td><td>50.42</td><td>3.43</td><td>5.73</td><td>24.15</td><td>22.50</td><td>33.00</td><td>29.54</td><td>29.46</td><td>27.08</td></tr>
+          <tr><td class="sub">w/ statistics</td><td>42.00</td><td>47.34</td><td>22.57</td><td>22.91</td><td>54.58</td><td>51.79</td><td>3.43</td><td>4.48</td><td>24.15</td><td>22.20</td><td>29.00</td><td>30.32</td><td>29.29</td><td>29.84</td></tr>
+
+          <tr class="grp"><td colspan="15">Time-series reasoning models</td></tr>
+          <tr><td class="fam">ChatTS-14B</td><td colspan="14"></td></tr>
+          <tr><td class="sub">Base Model</td><td>31.00</td><td>21.87</td><td>69.91</td><td>30.24</td><td>48.02</td><td>32.07</td><td>17.65</td><td>13.19</td><td>43.48</td><td>30.72</td><td>57.50</td><td>42.12</td><td>44.59</td><td>28.37</td></tr>
+          <tr><td class="sub">+ SFT</td><td>50.50</td><td>40.69</td><td>73.89</td><td>33.10</td><td>53.47</td><td>24.31</td><td>26.47</td><td>14.60</td><td>46.38</td><td>42.65</td><td>69.00</td><td>55.57</td><td>53.28</td><td>35.15</td></tr>
+          <tr><td class="fam">OpenTSLM-4B</td><td colspan="14"></td></tr>
+          <tr><td class="sub">+ SFT</td><td>82.69</td><td>82.66</td><td>65.49</td><td>38.29</td><td>69.50</td><td>41.00</td><td>35.37</td><td>18.99</td><td>47.50</td><td>35.81</td><td>76.25</td><td>69.36</td><td>62.80</td><td>47.68</td></tr>
+          <tr><td class="fam">ITFormer-4B</td><td colspan="14"></td></tr>
+          <tr><td class="sub">+ SFT</td><td>84.62</td><td>84.60</td><td>67.31</td><td>57.95</td><td>57.31</td><td>49.91</td><td>33.62</td><td>15.77</td><td>49.50</td><td>23.62</td><td>80.12</td><td>74.22</td><td>62.08</td><td>51.01</td></tr>
+
+          <tr class="grp"><td colspan="15">ARTIST (ours)</td></tr>
+          <tr><td class="sub">+ SFT</td><td>85.12</td><td>85.11</td><td>69.75</td><td>61.46</td><td>56.31</td><td>55.68</td><td>28.13</td><td>17.94</td><td>60.06</td><td>57.13</td><td>82.26</td><td>62.32</td><td>63.61</td><td>56.61</td></tr>
+          <tr class="best"><td class="sub">+ SFT + RL</td><td>87.03</td><td>87.10</td><td>77.00</td><td>50.00</td><td>69.81</td><td>52.67</td><td>36.63</td><td>19.21</td><td>62.00</td><td>58.66</td><td>83.06</td><td>78.02</td><td>69.26</td><td>57.61</td></tr>
+          <tr class="imp"><td>Improvement</td><td>+2.41</td><td>+2.50</td><td>+3.11</td><td>+3.51</td><td>+3.14</td><td>+3.89</td><td>+1.26</td><td>+0.22</td><td>+12.50</td><td>+11.91</td><td>+2.94</td><td>+3.80</td><td>+6.46</td><td>+6.60</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="note">ARTIST (SFT&nbsp;+&nbsp;RL) highlighted; <em>Improvement</em> is the gain over the strongest baseline per dataset and metric. The largest gains appear on rare-event localization and multi-segment reasoning (up to +12.5 points). Qwen3-8B failed to produce the required answer template on RCW (reported as 0.00). See the paper for vision-language comparisons, ablations, long-sequence scalability, and inference-cost analyses.</p>
+  </div>
+</section>
+
+<section id="citation">
+  <div class="wrap">
+    <h2>Citation</h2>
+    <pre><span class="copy" onclick="copyBib(this)">Copy</span><code id="bib">@inproceedings{messica2026artist,
+  title     = {Adaptive Time Series Reasoning via Segment Selection},
+  author    = {Messica, Shvat and Zhang, Jiawen and Li, Kevin and
+               Tsiligkaridis, Theodoros and Zitnik, Marinka},
+  booktitle = {Proceedings of the 43rd International Conference on Machine Learning (ICML)},
+  year      = {2026}
+}</code></pre>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p><a href="https://arxiv.org/abs/2602.18645">arXiv</a> · <a href="https://github.com/mims-harvard/ARTIST">Code</a> · <a href="https://zitniklab.hms.harvard.edu/">Zitnik Lab</a></p>
+    <p>Department of Biomedical Informatics, Harvard Medical School</p>
+  </div>
+</footer>
+
+<script>
+function copyBib(el){
+  const t = document.getElementById('bib').innerText;
+  navigator.clipboard.writeText(t).then(()=>{ el.textContent='Copied'; setTimeout(()=>el.textContent='Copy',1500); });
+}
+</script>
+</body>
+</html>
